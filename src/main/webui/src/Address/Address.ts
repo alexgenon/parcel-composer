@@ -93,5 +93,9 @@ export class Address {
         this.lastName = name.substring(lastSpace);
         this.firstName = name.substring(0, lastSpace - 1);
     }
+
+    id():string{
+        return this.lastName+this.firstName+this.city
+    }
 }
 

@@ -86,7 +86,7 @@ function ParcelComposer() {
             <Grid xs={12}>
                 <ul>
                     {
-                        parcelBasket.map(i => <li>{i.firstName}</li>)
+                        parcelBasket.map(it => <li>{it.firstName}</li>)
                     }
                 </ul>
             </Grid>
