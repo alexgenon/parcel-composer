@@ -1,18 +1,18 @@
 import React, {useState} from 'react';
 import {Button, Stack, TextField} from "@mui/material";
-import {Address} from "./Address";
+import {AddressBuilder} from "./Address";
 import Grid from "@mui/material/Unstable_Grid2";
 
 export interface AddressEditorProps {
-    address: Address;
+    address: AddressBuilder;
     buttonText: String;
-    buttonAction: (address:Address) => void;
+    buttonAction: (address:AddressBuilder) => void;
 }
 
 export function AddressEditor({address, buttonText,buttonAction}: AddressEditorProps) {
     const [updatedAddress, setUpdatedAddress] = useState(address)
-    const updateAddress = (fieldUpdater: (a:Address) => void) => {
-        let newAddress:Address= JSON.parse(JSON.stringify(updatedAddress)) as Address;
+    const updateAddress = (fieldUpdater: (a:AddressBuilder) => void) => {
+        let newAddress:AddressBuilder= JSON.parse(JSON.stringify(updatedAddress)) as AddressBuilder;
         fieldUpdater(newAddress);
         setUpdatedAddress(newAddress);
     }

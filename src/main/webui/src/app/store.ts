@@ -1,9 +1,11 @@
 import {configureStore} from '@reduxjs/toolkit'
 import parcelBasketReducer from "../Parcel/ParcelBasketSlice";
+import adressBookReducer from "../Address/AdressBookSlice";
 
 export const store = configureStore({
    reducer: {
-       parcelBasket: parcelBasketReducer
+       parcelBasket: parcelBasketReducer,
+       addressBook: adressBookReducer
    }
 });
 
