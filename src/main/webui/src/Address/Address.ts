@@ -3,10 +3,10 @@ export interface Address {
     firstName: string;
     lastName: string;
     street: string;
-    streetNb?: number;
+    streetNb: number;
     postboxLetter: string;
     city: string;
-    postcode?: number;
+    postcode: number;
     email: string;
     id: string;
 }
@@ -24,7 +24,7 @@ export class AddressBuilder {
     id: string = '';
 
     public build(): Address {
-        this.id = this.firstName + this.lastName + this.postAddressToString();
+        this.id = this.firstName + this.lastName + this.city;
         return {...this} as Address;
     }
 
@@ -116,7 +116,7 @@ export const someAddresses: Address[] = [{
     "email": "schmitz.adeline@hotmail.com",
     "name": "Adeline Schmitz",
     "street": "Rue des calvaires",
-    "street_nb": 51,
+    "streetNb": 51,
     "postcode": 6780,
     "postboxLetter": "",
     "city": "Wolkrange",
@@ -129,7 +129,7 @@ export const someAddresses: Address[] = [{
     "originalString": "Adélaide Lampson\n84, rue du Castel \n6700 Arlon\nadelaidelampson1@gmail.com",
     "name": "Adélaide Lampson",
     "street": "rue du Castel",
-    "street_nb": 84,
+    "streetNb": 84,
     "postboxLetter": ",",
     "city": "Arlon",
     "postcode": "6700",
@@ -142,7 +142,7 @@ export const someAddresses: Address[] = [{
     "lastName": "cimminiello",
     "firstName": "Alessandra",
     "street": "rue Nicolas Defrecheux",
-    "street_nb": 144,
+    "streetNb": 144,
     "postcode": 4040,
     "postboxLetter": "",
     "city": "Herstal",
@@ -152,7 +152,7 @@ export const someAddresses: Address[] = [{
     "email": "alexandra.delmotte@hotmail.com",
     "name": "Alexandre Delmotte",
     "street": "Rue de la Vallée",
-    "street_nb": 23,
+    "streetNb": 23,
     "postcode": 6200,
     "postboxLetter": "A",
     "city": "Chatelineau",
@@ -164,7 +164,7 @@ export const someAddresses: Address[] = [{
     "email": "",
     "name": "Alicia Bernard",
     "street": "voie des montagnard",
-    "street_nb": 19,
+    "streetNb": 19,
     "postcode": 6831,
     "postboxLetter": "",
     "city": "noirefontaine",
@@ -176,7 +176,7 @@ export const someAddresses: Address[] = [{
     "email": "aline.bielande@gmail.com",
     "name": "Aline Bielande",
     "street": "rue Fond de Chavée",
-    "street_nb": 1,
+    "streetNb": 1,
     "postcode": 4218,
     "postboxLetter": "A",
     "city": "Couthuin.",
@@ -189,7 +189,7 @@ export const someAddresses: Address[] = [{
     "originalString": "Aline Borges \nRue du Stade, 18\n6790 Aubange\nborges.nina@hotmail.com",
     "name": "Aline Borges",
     "street": "Rue du Stade",
-    "street_nb": "18",
+    "streetNb": "18",
     "postboxLetter": "",
     "city": "Aubange",
     "postcode": "6790",
@@ -200,7 +200,7 @@ export const someAddresses: Address[] = [{
     "email": "alineorban@hotmail.com",
     "name": "Aline Orban",
     "street": "Rue Tahée",
-    "street_nb": 45,
+    "streetNb": 45,
     "postcode": 6951,
     "postboxLetter": "",
     "city": "Bande",

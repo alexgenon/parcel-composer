@@ -33,7 +33,7 @@ function basketToCards(basket: Address[], removeAction: (address: Address) => vo
 
 function Basket({basket, removeAction}: BasketProps) {
     return (<>
-        <Typography variant="h2">Panier</Typography>
+        <Typography variant="h2">Panier ({basket.length} éléments)</Typography>
         <Grid container spacing={2}>
             {basketToCards(basket, removeAction)}
         </Grid>
