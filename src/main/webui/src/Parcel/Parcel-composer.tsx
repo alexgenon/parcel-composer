@@ -13,11 +13,10 @@ import Grid from '@mui/material/Unstable_Grid2'
 import {Address, AddressBuilder} from "../Address/Address";
 import {AddressEditor} from "../Address/AddressEditor";
 import {useAppDispatch, useAppSelector} from "../app/hook";
-import {addParcel, removeParcel, selectBasket} from "./ParcelBasketSlice";
-import {addAddress, removeAddress, selectAddressBook} from "../Address/AdressBookSlice"
+import {addParcel, removeParcel, resetBasket, selectBasket} from "./ParcelBasketSlice";
 import Basket from "./Basket";
 import SearchResults from "./SearchResults";
-import {useGetAllAddressesQuery} from "../Address/AddressApi";
+import {useGetAllAddressesQuery, useAddNewAddressMutation, useDeleteAddressMutation} from "../Address/AddressApi";
 
 
 function ParcelComposer() {
@@ -26,8 +25,15 @@ function ParcelComposer() {
     const [newAddress, setNewAddress] = useState<AddressBuilder | undefined>(undefined);
     const [addressToRemove, setAddressToRemove] = useState<Address | undefined>(undefined);
     const parcelBasket: Address[] = useAppSelector(selectBasket);
-    const addressBook: Address[] = useAppSelector(selectAddressBook);
+    const {data: addressBookData, error: fetchAddressBookError, isLoading: isAddressBookLoading} = useGetAllAddressesQuery();
+    let addressBook: Address[] = addressBookData?(addressBookData as Address[]):[];
+    const [addNewAddress,{isLoading:isAdding}] = useAddNewAddressMutation();
+    const [deleteAddress,{isLoading:isDeleting}] = useDeleteAddressMutation();
     const dispatch = useAppDispatch();
+
+    if(fetchAddressBookError){
+        console.error(JSON.stringify(fetchAddressBookError));
+    }
 
     function findCandidateAddresses(searchString: string) {
         if (searchString.length >= 2) {
@@ -50,6 +56,9 @@ function ParcelComposer() {
         dispatch(removeParcel(address));
     })
 
+    const finalizeParcels = (() => {
+        dispatch(resetBasket());
+    });
 
     return (<>
             <Grid container alignItems="flex-start" spacing={2} padding={3}>
@@ -78,12 +87,12 @@ function ParcelComposer() {
                                                         setInputStringAddress('');
                                                         let finalAddress = a.build();
                                                         dispatch(addParcel(finalAddress));
-                                                        dispatch(addAddress(finalAddress));
+                                                        addNewAddress(finalAddress);
                                                     }}
                             />
                             : <SearchResults candidateAddresses={candidateAddresses}
                                              addressClicked={address => {
-                                                 setInputStringAddress('');
+                                                 updateInputSearchString('');
                                                  dispatch(addParcel(address));
                                              }}
                                              removeAddress={address => {
@@ -98,12 +107,20 @@ function ParcelComposer() {
                         removeAction={removeFromBasketAction}
                     />
                 </Grid>
+                <Grid xs={4}>
+                    <Button variant="outlined"
+                            onClick={finalizeParcels}
+                    >
+                        Finaliser les colis
+                    </Button>
+                </Grid>
             </Grid>
             <ConfirmRemovalDialog
                 address={addressToRemove}
                 processResponse={confirmed => {
                     if (confirmed) {
-                        dispatch(removeAddress(addressToRemove as Address));
+                        let finalAddress = addressToRemove as Address
+                        deleteAddress(finalAddress.id);
                         setCandidateAddresses(candidateAddresses.filter(it => it.id !== addressToRemove?.id))
                     }
                     setAddressToRemove(undefined)

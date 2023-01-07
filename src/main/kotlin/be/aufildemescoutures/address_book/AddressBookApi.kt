@@ -3,8 +3,11 @@ package be.aufildemescoutures.address_book
 import org.jboss.logging.Logger
 import javax.enterprise.inject.Default
 import javax.inject.Inject
+import javax.ws.rs.DELETE
 import javax.ws.rs.GET
+import javax.ws.rs.POST
 import javax.ws.rs.Path
+import javax.ws.rs.PathParam
 import javax.ws.rs.Produces
 import javax.ws.rs.core.MediaType
 
@@ -17,7 +20,13 @@ class AddressBookApi {
     lateinit var addressService: AddressBookService
 
     @GET
-    @Path("addresses")
     @Produces(MediaType.APPLICATION_JSON)
     fun getAllAddresses() = addressService.getAllAddresses()
+
+    @POST
+    fun newAddress(address: Address) = addressService.newAddress(address)
+
+    @DELETE
+    @Path("{id}")
+    fun removeAddress(@PathParam("id") id:String) = addressService.removeAddress(id)
 }

@@ -54,7 +54,7 @@ export function AddressEditor({address, buttonText,buttonAction}: AddressEditorP
                                          label="Numéro"
                                          onChange={ e => {
                                              updateAddress(a => {
-                                                 a.streetNb = Number.parseInt(e.target.value);
+                                                 a.streetNb = e.target.value;
                                              })
                                          }}
                 /> </Grid>

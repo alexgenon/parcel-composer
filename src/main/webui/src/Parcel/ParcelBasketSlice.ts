@@ -1,5 +1,5 @@
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
-import {AddressBuilder, Address, someAddresses} from "../Address/Address";
+import {Address} from "../Address/Address";
 import {RootState} from "../app/store";
 
 interface ParcelBasketState {
@@ -7,8 +7,7 @@ interface ParcelBasketState {
 }
 
 const initialState: ParcelBasketState = {
-    //basket: []
-    basket: someAddresses
+    basket: []
 }
 
 export const parcelBasketSlice = createSlice({
@@ -20,11 +19,14 @@ export const parcelBasketSlice = createSlice({
         },
         removeParcel: (state:ParcelBasketState, action: PayloadAction<Address>) => {
             state.basket = state.basket.filter((it) => {return (it.id !== action.payload.id)});
+        },
+        resetBasket:(state:ParcelBasketState) => {
+            state.basket = [];
         }
     }
 })
 
-export const {addParcel,removeParcel} = parcelBasketSlice.actions
+export const {addParcel,removeParcel,resetBasket} = parcelBasketSlice.actions
 export const selectBasket = (state: RootState) => state.parcelBasket.basket
 
 export default parcelBasketSlice.reducer
