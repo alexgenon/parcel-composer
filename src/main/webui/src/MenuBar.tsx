@@ -35,7 +35,7 @@ function MenuBar({screens}: MenuBarProps) {
                         {
                             screens.map(screen => {
                                 return (
-                                    <Link to={screen.path}>
+                                    <Link to={screen.path} key={screen.name}>
                                         <Button sx={{
                                             textDecoration: "none",
                                             color: "white",
