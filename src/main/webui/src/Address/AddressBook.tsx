@@ -1,5 +1,22 @@
+import {useGetAllAddressesQuery} from "./AddressApi";
+import {Address} from "./Address";
+
 function AddressBook() {
-    return (<div>AdressBook: Work in progress</div>)
+
+    const {data, error, isLoading} = useGetAllAddressesQuery('');
+    if(isLoading) {
+        return (<div>"Loading addresses"</div>);
+    } else if(data){
+        let addresses: Address[] = data as Address[];
+        return(<ul>
+            {addresses.map(address =>
+                <li key={address.id}>
+                {address.firstName }
+                </li>)}
+        </ul>);
+    }else {
+        return(<div> {"Error"+JSON.stringify(error)}</div>);
+    }
 }
 
 export default AddressBook;

@@ -17,6 +17,7 @@ import {addParcel, removeParcel, selectBasket} from "./ParcelBasketSlice";
 import {addAddress, removeAddress, selectAddressBook} from "../Address/AdressBookSlice"
 import Basket from "./Basket";
 import SearchResults from "./SearchResults";
+import {useGetAllAddressesQuery} from "../Address/AddressApi";
 
 
 function ParcelComposer() {
