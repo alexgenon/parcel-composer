@@ -17,6 +17,7 @@ import {addParcel, removeParcel, resetBasket, selectBasket} from "./ParcelBasket
 import Basket from "./Basket";
 import SearchResults from "./SearchResults";
 import {useGetAllAddressesQuery, useAddNewAddressMutation, useDeleteAddressMutation} from "../Address/AddressApi";
+import {ToBpostCSV} from "../Adapters/ToBpostCSV";
 
 
 function ParcelComposer() {
@@ -25,10 +26,10 @@ function ParcelComposer() {
     const [newAddress, setNewAddress] = useState<AddressBuilder | undefined>(undefined);
     const [addressToRemove, setAddressToRemove] = useState<Address | undefined>(undefined);
     const parcelBasket: Address[] = useAppSelector(selectBasket);
-    const {data: addressBookData, error: fetchAddressBookError, isLoading: isAddressBookLoading} = useGetAllAddressesQuery();
+    const {data: addressBookData, error: fetchAddressBookError} = useGetAllAddressesQuery();
     let addressBook: Address[] = addressBookData?(addressBookData as Address[]):[];
-    const [addNewAddress,{isLoading:isAdding}] = useAddNewAddressMutation();
-    const [deleteAddress,{isLoading:isDeleting}] = useDeleteAddressMutation();
+    const [addNewAddress] = useAddNewAddressMutation();
+    const [deleteAddress] = useDeleteAddressMutation();
     const dispatch = useAppDispatch();
 
     if(fetchAddressBookError){
@@ -56,7 +57,9 @@ function ParcelComposer() {
         dispatch(removeParcel(address));
     })
 
-    const finalizeParcels = (() => {
+    const commitBasket = (() => {
+        let exportBlob = ToBpostCSV.exportToBPostCSV(parcelBasket);
+        initiateDownload(exportBlob);
         dispatch(resetBasket());
     });
 
@@ -109,7 +112,7 @@ function ParcelComposer() {
                 </Grid>
                 <Grid xs={4}>
                     <Button variant="outlined"
-                            onClick={finalizeParcels}
+                            onClick={commitBasket}
                     >
                         Finaliser les colis
                     </Button>
@@ -165,3 +168,22 @@ function ConfirmRemovalDialog({address, processResponse}: ConfirmRemovalDialogPr
 }
 
 export default ParcelComposer
+
+/*
+    Source of inspiration: https://www.geeksforgeeks.org/how-to-download-pdf-file-in-reactjs/
+ */
+function initiateDownload(exportBlob: Blob){
+    const fileURL = URL.createObjectURL(exportBlob);
+    let alink = document.createElement('a');
+    let n=new Date();
+    let fileSuffix = `${n.getFullYear()}_${to2chars(n.getMonth())}_${to2chars(n.getDay())}_${to2chars(n.getHours())}_${to2chars(n.getMinutes())}`
+    alink.href = fileURL;
+    alink.download = `colis_bpost_${fileSuffix}.csv`;
+    alink.click();
+    alink.remove();
+    URL.revokeObjectURL(fileURL);
+}
+
+function to2chars(num: number):string {
+    return num.toString().padStart(2,'0');
+}
