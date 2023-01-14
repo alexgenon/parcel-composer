@@ -1,4 +1,4 @@
-package be.aufildemescoutures.address_book
+package be.aufildemescoutures.parcel_composer.address_book
 
 @kotlinx.serialization.Serializable
 data class Address(

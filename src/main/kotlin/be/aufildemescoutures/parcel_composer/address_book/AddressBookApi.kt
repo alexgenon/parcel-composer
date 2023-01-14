@@ -1,4 +1,4 @@
-package be.aufildemescoutures.address_book
+package be.aufildemescoutures.parcel_composer.address_book
 
 import org.jboss.logging.Logger
 import javax.enterprise.inject.Default

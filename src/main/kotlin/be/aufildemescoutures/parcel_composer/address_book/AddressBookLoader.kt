@@ -1,4 +1,4 @@
-package be.aufildemescoutures.address_book
+package be.aufildemescoutures.parcel_composer.address_book
 
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json

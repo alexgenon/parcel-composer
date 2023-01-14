@@ -18,6 +18,7 @@ import Basket from "./Basket";
 import SearchResults from "./SearchResults";
 import {useGetAllAddressesQuery, useAddNewAddressMutation, useDeleteAddressMutation} from "../Address/AddressApi";
 import {ToBpostCSV} from "../Adapters/ToBpostCSV";
+import {useGetSenderHeaderQuery} from "../Adapters/BpostApi";
 
 
 function ParcelComposer() {
@@ -30,6 +31,7 @@ function ParcelComposer() {
     let addressBook: Address[] = addressBookData?(addressBookData as Address[]):[];
     const [addNewAddress] = useAddNewAddressMutation();
     const [deleteAddress] = useDeleteAddressMutation();
+    const {data: senderHeader} = useGetSenderHeaderQuery();
     const dispatch = useAppDispatch();
 
     if(fetchAddressBookError){
@@ -58,7 +60,7 @@ function ParcelComposer() {
     })
 
     const commitBasket = (() => {
-        let exportBlob = ToBpostCSV.exportToBPostCSV(parcelBasket);
+        let exportBlob = ToBpostCSV.exportToBPostCSV(parcelBasket,senderHeader);
         initiateDownload(exportBlob);
         dispatch(resetBasket());
     });

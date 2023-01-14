@@ -1,6 +1,7 @@
 import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react'
 import {Address} from "./Address";
 
+// noinspection TypeScriptValidateTypes
 export const addressApi = createApi({
     reducerPath: 'addressApi',
     keepUnusedDataFor: 0,
