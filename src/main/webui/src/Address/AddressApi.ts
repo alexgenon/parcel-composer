@@ -1,24 +1,17 @@
-import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react'
 import {Address} from "./Address";
+import {parcelComposerApi} from "../app/parcelComposerApi";
 
 // noinspection TypeScriptValidateTypes
-export const addressApi = createApi({
-    reducerPath: 'addressApi',
-    keepUnusedDataFor: 0,
-    tagTypes:['Address'],
-    baseQuery: fetchBaseQuery({ baseUrl: 'http://localhost:8080/api/' }),
+const addressApi = parcelComposerApi.injectEndpoints({
     endpoints: (builder) => ({
         getAllAddresses: builder.query<Address[],void>({
             query: () => 'address-book',
-            providesTags: (result) =>
-                result ?
-                    [
-                        ...result.map(({id}) => ({type: 'Address', id} as const)),
-                        {type: 'Address', id: 'LIST'}
-                    ]
-                :
-                    [{ type: 'Address', id: 'LIST' }],
+            providesTags: (result) => {
+                let resultSafe =(result?result:[]);
+                return [{ type: 'Address', id: 'LIST' }, ...resultSafe.map(({id}) => ({type: 'Address', id} as const))]
+            }
         }),
+        // TODO: Setup optimistic update to cope with no network https://redux-toolkit.js.org/rtk-query/usage/manual-cache-updates
         addNewAddress: builder.mutation<Address,Partial<Address>>({
             query(body){
                 return {

@@ -31,7 +31,7 @@ export class AddressBuilder {
     static NB_AND_STRING_REGEX = /\s*([0-9]+[a-z,A-Z]*)?,?\s*(.+?),?\s*([0-9]+[a-z,A-Z]*)?\s*$/;
     static HAS_NUMBER_REGEX = /\d/
     static NB_AND_LETTER = /([0-9]+)([a-z,A-Z]*)/;
-    static EMAIL_REGEX = /([\w-\.]+@[\w-]+\.+[\w-]+)/
+    static EMAIL_REGEX = /([\w-.]+@[\w-]+\.+[\w-]+)/
 
     private static getTrimmedRowIfPresent(array: any[], index: number) {
         let row = (array.length >= index + 1 ? array[index] : "") as string;
@@ -68,7 +68,6 @@ export class AddressBuilder {
 
     static fromString(originalString: string): AddressBuilder {
         let lines: string[] = originalString.split(/\r\n|\r|\n/);
-        let nl = lines.length;
         let address = new AddressBuilder();
         address.originalString = originalString;
         for (let line of lines) {
@@ -95,9 +94,6 @@ export class AddressBuilder {
             }
         }
         return address;
-    }
-
-    constructor() {
     }
 
     postAddressToString(): string {

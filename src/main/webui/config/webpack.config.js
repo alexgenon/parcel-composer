@@ -568,6 +568,14 @@ module.exports = function (webpackEnv) {
                 swDest: 'sw.js',
                 clientsClaim: true,
                 skipWaiting: true,
+                runtimeCaching: [{
+                   urlPattern: new RegExp("/api/*"),
+                    handler: 'NetworkFirst'
+
+                },{
+                    urlPattern: new RegExp("/*"),
+                    handler: 'StaleWhileRevalidate'
+                }]
             }),
             // Generates an `index.html` file with the <script> injected.
             new HtmlWebpackPlugin(

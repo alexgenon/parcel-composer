@@ -1,10 +1,7 @@
-import {createApi, fetchBaseQuery} from "@reduxjs/toolkit/query/react";
+import {parcelComposerApi} from "../app/parcelComposerApi";
 
 // noinspection TypeScriptValidateTypes
-export const bpostApi = createApi({
-    reducerPath: 'bpostApi',
-    keepUnusedDataFor: 0,
-    baseQuery: fetchBaseQuery({baseUrl: "http://localhost:8080/api"}),
+const bpostApi = parcelComposerApi.injectEndpoints({
     endpoints: (builder) =>({
       getSenderHeader: builder.query<string,void>({
           query: () => 'bpost/sender_header'
