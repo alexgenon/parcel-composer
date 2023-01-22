@@ -6,7 +6,7 @@ import javax.ws.rs.Path
 
 @Path("bpost")
 class BpostApi {
-    @ConfigProperty(name="parcel-composer.bpost.sender_header")
+    @ConfigProperty(name="parcel_composer.bpost.sender_header")
     lateinit var senderHeader: String
 
     @GET

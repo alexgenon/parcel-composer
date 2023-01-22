@@ -10,27 +10,27 @@ import CustomerOnMap from "./CustomerOnMap/CustomerOnMap";
 
 export type ApplicationScreens = { name: string, path: string, element: React.ReactNode, displayOnMenu: boolean, default: boolean }
 
-function App() {
-    const screens: ApplicationScreens[] = [{
-        name: "Préparer envois",
-        path: "/",
-        element: <ParcelComposer/>,
-        default: true,
-        displayOnMenu: true
-    }, {
-        name: "Carnet adresses",
-        path: "/addresses",
-        element: <AddressBook/>,
-        default: false,
-        displayOnMenu: true
-    }, {
-        name: "Carte clients",
-        path: "/map",
-        element: <CustomerOnMap/>,
-        default: false,
-        displayOnMenu: true
-    }]
+const screens: ApplicationScreens[] = [{
+    name: "Préparer envois",
+    path: "/",
+    element: <ParcelComposer/>,
+    default: true,
+    displayOnMenu: true
+}, {
+    name: "Carnet adresses",
+    path: "/addresses",
+    element: <AddressBook/>,
+    default: false,
+    displayOnMenu: true
+}, {
+    name: "Carte clients",
+    path: "/map",
+    element: <CustomerOnMap/>,
+    default: false,
+    displayOnMenu: true
+}]
 
+function App() {
     return (
         <Provider store={store}>
             <BrowserRouter>
