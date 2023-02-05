@@ -1,5 +1,7 @@
 package be.aufildemescoutures.parcel_composer.address_book
 
+import be.aufildemescoutures.parcel_composer.user.UserId
+import io.quarkus.security.identity.SecurityIdentity
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
@@ -26,6 +28,9 @@ class AddressBookLoader {
     @field:Default
     lateinit var addressService: AddressBookService
 
+    @Inject
+    lateinit var securityIdentity: SecurityIdentity
+
     @POST
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     fun loadFromLocalFile(
@@ -41,15 +46,12 @@ class AddressBookLoader {
         }
         LOG.info("About to load ${addresses.size} using strategy $loadingStrategy")
         when (loadingStrategy) {
-            LoadingStrategy.TRUNCATE_AND_LOAD -> addressService.resetAddressBook(addresses)
+            LoadingStrategy.TRUNCATE_AND_LOAD -> addressService.resetAddressBook(getUserId(),addresses)
             LoadingStrategy.MERGE -> {
-                addressService.addAddresses(addresses)
-            }
-            else -> {
-                TODO("Loading strategy $loadingStrategy Not yet implemented")
+                addressService.addAddresses(getUserId(),addresses)
             }
         }
-        return "Loaded ${addresses.size} addresses using Loading strategy $loadingStrategy: new Address book size is ${addressService.getAllAddresses().size}\n" + errors.joinToString("\n","Errors:\n","\n")
+        return "Loaded ${addresses.size} addresses using Loading strategy $loadingStrategy: new Address book size is ${addressService.getAllAddresses(getUserId()).size}\n" + errors.joinToString("\n","Errors:\n","\n")
     }
 
 
@@ -100,4 +102,6 @@ class AddressBookLoader {
             }
         return Pair(parsedAddresses,errorList)
     }
+
+    private fun getUserId() = UserId(securityIdentity.principal.name)
 }

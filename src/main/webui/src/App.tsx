@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
 import MenuBar from "./MenuBar";
 import AddressBook from "./Address/AddressBook";
 import CustomerOnMap from "./CustomerOnMap/CustomerOnMap";
+import {AuthContextProps, useAuth} from "react-oidc-context";
 
 export type ApplicationScreens = { name: string, path: string, element: React.ReactNode, displayOnMenu: boolean, default: boolean }
 
@@ -30,35 +31,57 @@ const screens: ApplicationScreens[] = [{
     displayOnMenu: true
 }]
 
+
 function App() {
-    return (
-        <Provider store={store}>
-            <BrowserRouter>
-                <Routes>
-                    <Route path="/" element={<AppLayout screens={screens}/>}>
-                        {screens.map(screen => {
-                            if (screen.default) {
-                                return (<Route key = {screen.path} index element={screen.element}/>);
-                            } else {
-                                return(<Route key = {screen.path} path={screen.path} element={screen.element}/>);
-                            }
-                        })}
-                    </Route>
-                </Routes>
-            </BrowserRouter>
-        </Provider>
-    );
+    const auth = useAuth();
+    console.log("auth: ");
+    console.log(auth);
+    switch (auth.activeNavigator) {
+        case "signinSilent":
+            return <div>Signing you in...</div>;
+        case "signoutRedirect":
+            return <div>Signing you out...</div>;
+    }
+
+    if (auth.isLoading) {
+        return <div>Loading...</div>;
+    }
+
+    if (auth.error) {
+        return <div>Oops... {auth.error.message}</div>;
+    }
+
+
+        return (
+            <Provider store={store}>
+                <BrowserRouter>
+                    <Routes>
+                        <Route path="/" element={<AppLayout screens={screens} auth={auth}/>}>
+                            {screens.map(screen => {
+                                if (screen.default) {
+                                    return (<Route key={screen.path} index element={screen.element}/>);
+                                } else {
+                                    return (<Route key={screen.path} path={screen.path} element={screen.element}/>);
+                                }
+                            })}
+                        </Route>
+                    </Routes>
+                </BrowserRouter>
+            </Provider>
+        );
 }
 
 interface AppLayoutProps {
-    screens: ApplicationScreens[]
+    screens: ApplicationScreens[],
+    auth: AuthContextProps
 }
 
-function AppLayout({screens}: AppLayoutProps) {
+function AppLayout({screens, auth}: AppLayoutProps) {
     return (<>
-            <MenuBar screens={screens}/>
+            <MenuBar screens={screens} loggedInUser={auth.user?.profile.given_name} loginCallback={auth.signinRedirect} logoutCallback={auth.signoutRedirect}/>
             <Outlet/>
         </>
     );
 }
+
 export default App;

@@ -1,28 +1,45 @@
 package be.aufildemescoutures.parcel_composer.address_book
 
+import be.aufildemescoutures.parcel_composer.user.UserId
+import be.aufildemescoutures.parcel_composer.user.UserService
 import org.jboss.logging.Logger
 import javax.enterprise.context.ApplicationScoped
+import javax.enterprise.inject.Default
+import javax.inject.Inject
 
 @ApplicationScoped
 class AddressBookService {
+
+    @Inject
+    @field:Default
+    lateinit var userService: UserService
+
     private val LOG = Logger.getLogger(javaClass)
-    private var addressRepository = emptySet<Address>()
-    fun resetAddressBook(newAddresses: Set<Address>) {
-        this.addressRepository = newAddresses
+    private val addressRepository:MutableMap<UserId,AddressBook> = mutableMapOf()
+
+    fun resetAddressBook(userId:UserId,newAddresses: AddressBook) {
+        this.addressRepository[userId]= newAddresses
     }
 
-    fun getAllAddresses(): Set<Address> = this.addressRepository
-    fun addAddresses(addresses: Set<Address>) {
-        addressRepository = addressRepository.plus(addresses)
+    fun getAllAddresses(userId:UserId): AddressBook = this.addressRepository.getOrElse(userId) {  emptySet() }
+
+    private fun applyToAddressBook (userId: UserId, update: (AddressBook) -> AddressBook ) {
+        val newAddressBook = update(this.getAllAddresses(userId))
+        addressRepository[userId] = newAddressBook
     }
 
-    fun newAddress(address: Address) {
-        LOG.info("Adding address $address")
-        addressRepository = addressRepository.plus(address)
+    fun addAddresses(userId:UserId, addresses: Set<Address>) {
+        LOG.info("Adding addresses $addresses to $userId address book")
+        applyToAddressBook(userId) {it.plus(addresses)}
     }
 
-    fun removeAddress(id:String){
-        LOG.info("Removing address $id")
-        addressRepository = addressRepository.filter { it.id != id }.toSet()
+    fun newAddress(userId:UserId, address: Address) {
+        LOG.info("Adding address $address to $userId address book")
+        applyToAddressBook(userId) {it.plus(address)}
+    }
+
+    fun removeAddress(userId:UserId, id:String){
+        LOG.info("Removing address $id for $userId")
+        applyToAddressBook(userId) {it.filter {ad -> ad.id != id }.toSet()}
     }
 }

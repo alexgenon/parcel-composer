@@ -1,14 +1,28 @@
 import {ApplicationScreens} from "./App";
-import {AppBar, Box, Button, makeStyles, Toolbar, Typography} from "@mui/material";
+import {AppBar, Box, Button, Toolbar, Typography} from "@mui/material";
 import {LocalShipping} from "@mui/icons-material";
 import React from "react";
 import {Link} from "react-router-dom";
 
 interface MenuBarProps {
     screens: ApplicationScreens[]
+    loggedInUser?: string
+    loginCallback: () => void
+    logoutCallback: () => void
 }
 
-function MenuBar({screens}: MenuBarProps) {
+function MenuBar({screens,loggedInUser,loginCallback,logoutCallback}: MenuBarProps) {
+    const menuBarStyle = {
+        textDecoration: "none",
+        underline: "none",
+        color: "white",
+        fontSize: "20px",
+        marginLeft: 2,
+        "&:hover": {
+            color: "yellow",
+            borderBottom: "1px solid white",
+        }
+    }
     return (<Box sx={{flexGrow: 1}}>
         <nav>
             <AppBar position="static" component="nav">
@@ -20,32 +34,23 @@ function MenuBar({screens}: MenuBarProps) {
                         component="a"
                         href=""
                         sx={{
-                            mr: 2,
+                            mr: 1,
                             display: 'flex',
                             fontFamily: 'monospace',
-                            fontWeight: 700,
+                            fontWeight: 500,
                             letterSpacing: '.2rem',
                             color: 'inherit',
                             textDecoration: 'none',
                         }}
                     >
-                        BPost Parcel Composer
+                        Parcel Composer
                     </Typography>
                     <Box sx={{flexGrow: 1, display: "flex"}}>
                         {
                             screens.map(screen => {
                                 return (
                                     <Link to={screen.path} key={screen.name}>
-                                        <Button sx={{
-                                            textDecoration: "none",
-                                            color: "white",
-                                            fontSize: "20px",
-                                            marginLeft: 2,
-                                            "&:hover": {
-                                                color: "yellow",
-                                                borderBottom: "1px solid white",
-                                            }
-                                        }}
+                                        <Button sx={menuBarStyle}
                                         >
                                             {screen.name}
                                         </Button>
@@ -53,6 +58,7 @@ function MenuBar({screens}: MenuBarProps) {
                             })
                         }
                     </Box>
+                    <Box><Button sx={menuBarStyle} onClick={loggedInUser?logoutCallback:loginCallback}> {loggedInUser??"Click to login"}</Button></Box>
                 </Toolbar>
             </AppBar>
         </nav>

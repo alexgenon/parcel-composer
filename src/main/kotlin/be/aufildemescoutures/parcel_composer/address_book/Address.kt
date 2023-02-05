@@ -13,3 +13,5 @@ data class Address(
     val postcode: Int, // Post code is officially defined as 4 digits so Int is safe here
     val email: String?,
 )
+
+typealias AddressBook=Set<Address>
