@@ -8,7 +8,7 @@ export interface Address {
     city: string;
     postcode: number;
     email: string;
-    id: string;
+    businessId: string;
 }
 
 export class AddressBuilder {
@@ -21,10 +21,10 @@ export class AddressBuilder {
     city: string = '';
     postcode?: number = undefined;
     email: string = '';
-    id: string = '';
+    businessId: string = '';
 
     public build(): Address {
-        this.id = this.firstName + this.lastName + this.city;
+        this.businessId = this.firstName + this.lastName + this.city;
         return {...this} as Address;
     }
 

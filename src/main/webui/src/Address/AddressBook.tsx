@@ -10,7 +10,7 @@ function AddressBook() {
         let addresses: Address[] = data as Address[];
         return (<ul>
             {addresses.map(address =>
-                <li key={address.id}>
+                <li key={address.businessId}>
                     {address.firstName}
                 </li>)}
         </ul>);

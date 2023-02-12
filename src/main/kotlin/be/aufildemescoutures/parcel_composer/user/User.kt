@@ -1,6 +1,16 @@
 package be.aufildemescoutures.parcel_composer.user
 
-@JvmInline
-value class UserId(val id:String)
+import io.quarkus.hibernate.orm.panache.kotlin.PanacheEntity
+import javax.persistence.Entity
 
-data class User (val id:UserId)
+@kotlinx.serialization.Serializable
+data class UserId(val id:String)
+
+@kotlinx.serialization.Serializable
+class User():PanacheEntity(){
+    lateinit var userId: UserId
+
+    constructor(userId: UserId) : this() {
+        this.userId = userId
+    }
+}

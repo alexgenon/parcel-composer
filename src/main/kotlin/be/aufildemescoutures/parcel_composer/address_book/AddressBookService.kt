@@ -6,8 +6,10 @@ import org.jboss.logging.Logger
 import javax.enterprise.context.ApplicationScoped
 import javax.enterprise.inject.Default
 import javax.inject.Inject
+import javax.transaction.Transactional
 
 @ApplicationScoped
+@Transactional
 class AddressBookService {
 
     @Inject
@@ -15,31 +17,32 @@ class AddressBookService {
     lateinit var userService: UserService
 
     private val LOG = Logger.getLogger(javaClass)
-    private val addressRepository:MutableMap<UserId,AddressBook> = mutableMapOf()
 
-    fun resetAddressBook(userId:UserId,newAddresses: AddressBook) {
-        this.addressRepository[userId]= newAddresses
+    fun resetAddressBook(userId:UserId,newAddresses: Set<Address>) {
+        LOG.info("Resetting $userId address book")
+        val book = AddressBook.findByUser(userId)
+        book.truncateBook()
+        this.addAddresses(book,newAddresses)
     }
 
-    fun getAllAddresses(userId:UserId): AddressBook = this.addressRepository.getOrElse(userId) {  emptySet() }
+    fun getAllAddresses(userId:UserId) = AddressBook.findByUser(userId).allAddresses()
 
-    private fun applyToAddressBook (userId: UserId, update: (AddressBook) -> AddressBook ) {
-        val newAddressBook = update(this.getAllAddresses(userId))
-        addressRepository[userId] = newAddressBook
-    }
+    private fun addAddresses(addressBook: AddressBook, addresses: Set<Address>) =
+        addresses.forEach { addressBook.newAddress(it) }
 
     fun addAddresses(userId:UserId, addresses: Set<Address>) {
         LOG.info("Adding addresses $addresses to $userId address book")
-        applyToAddressBook(userId) {it.plus(addresses)}
+        val addressBook = AddressBook.findByUser(userId)
+        this.addAddresses(addressBook,addresses)
     }
 
     fun newAddress(userId:UserId, address: Address) {
         LOG.info("Adding address $address to $userId address book")
-        applyToAddressBook(userId) {it.plus(address)}
+        AddressBook.findByUser(userId).newAddress(address)
     }
 
-    fun removeAddress(userId:UserId, id:String){
-        LOG.info("Removing address $id for $userId")
-        applyToAddressBook(userId) {it.filter {ad -> ad.id != id }.toSet()}
+    fun removeAddress(userId:UserId, businessId:String){
+        val deleteCount = AddressBook.findByUser(userId).removeAddress(businessId)
+        LOG.info("Removing address $businessId from $userId address book: $deleteCount entries removed")
     }
 }

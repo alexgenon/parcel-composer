@@ -82,7 +82,7 @@ class AddressBookLoader {
             .fold(emptySet()) { targetSet, element ->
                 try {
                     targetSet.plus(Address(
-                        id = element["firstName"].toCleanString() + element["lastName"].toCleanString() + element["city"].toCleanString(),
+                        businessId = element["firstName"].toCleanString() + element["lastName"].toCleanString() + element["city"].toCleanString(),
                         originalString = element["originalString"].toCleanString(),
                         firstName = element["firstName"].toCleanString(),
                         lastName = element["lastName"].toCleanString(),

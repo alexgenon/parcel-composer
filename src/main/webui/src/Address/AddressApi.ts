@@ -8,7 +8,7 @@ const addressApi = parcelComposerApi.injectEndpoints({
             query: () => 'address-book',
             providesTags: (result) => {
                 let resultSafe =(result?result:[]);
-                return [{ type: 'Address', id: 'LIST' }, ...resultSafe.map(({id}) => ({type: 'Address', id} as const))]
+                return [{ type: 'Address', id: 'LIST' }, ...resultSafe.map(({businessId}) => ({type: 'Address', businessId} as const))]
             }
         }),
         // TODO: Setup optimistic update to cope with no network https://redux-toolkit.js.org/rtk-query/usage/manual-cache-updates

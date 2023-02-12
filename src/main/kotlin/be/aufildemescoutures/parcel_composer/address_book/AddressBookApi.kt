@@ -35,7 +35,7 @@ class AddressBookApi {
 
     @DELETE
     @Path("{id}")
-    fun removeAddress(@PathParam("id") id:String) = addressService.removeAddress(getUserId(),id)
+    fun removeAddress(@PathParam("id") businessId:String) = addressService.removeAddress(getUserId(),businessId)
 
     private fun getUserId() = UserId(securityIdentity.principal.name)
 }

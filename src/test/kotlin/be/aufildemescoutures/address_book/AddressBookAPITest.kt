@@ -1,50 +1,71 @@
 package be.aufildemescoutures.address_book
 
-import be.aufildemescoutures.parcel_composer.address_book.Address
 import io.quarkus.test.junit.QuarkusTest
 import io.quarkus.test.security.TestSecurity
-import io.restassured.RestAssured.post
 import io.restassured.module.kotlin.extensions.Given
 import io.restassured.module.kotlin.extensions.Then
 import io.restassured.module.kotlin.extensions.When
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.encodeToJsonElement
+import kotlinx.serialization.json.jsonObject
 import org.hamcrest.CoreMatchers.*
+import org.hamcrest.Matchers.greaterThanOrEqualTo
+import org.hamcrest.Matchers.lessThan
+import org.hamcrest.number.IsCloseTo
+import org.jboss.logging.Logger
+import org.junit.jupiter.api.MethodOrderer
+import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestMethodOrder
+import java.time.Instant
 import javax.ws.rs.core.MediaType
 
 @QuarkusTest
 @TestSecurity(user = "testUser")
+@TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 class AddressBookAPITest {
-    val dummyAddress = Address("123","Ronald McDonald\\n Fast food Street","Ronald","McDonald","Fast food street","12","","Junk Food",156,"ro@mcdo.com")
-    val dummyAddressUser2 = Address("456","SomeRandomText","Burger","King","Fast food street","34","","Junk Food",156,"burger@king.com")
+
+    private val LOG = Logger.getLogger(javaClass)
+    @Order(1)
     @Test
     fun testEmptyAddresses(){
-        Given{
-            auth().preemptive().basic("alex", "genon")
-        }
         When {
             get ("/api/address-book")
         } Then {
+            log().all()
             statusCode(200)
             body("size()",`is`(0))
         }
     }
 
     @Test
+    @Order(2)
     fun testAddAddress(){
+        val dummyAddressJson = Json.encodeToJsonElement(DummyAddresses.dummyAddress())
+            // Scenario is to call the API endpoint for a new address and creationTimestamp is set by the
+            // backend.
+            .jsonObject.minus("creationTimestamp")
+        LOG.debug("Will submit the following address: $dummyAddressJson")
         Given{
             contentType(MediaType.APPLICATION_JSON)
-            body(dummyAddress)
+            // RestAssured uses Gson or Jackson but does not support kotlinx-serialization.
+            // Have to explicitly serialize to avoid mismatch
+            body(Json.encodeToString(dummyAddressJson))
         } When{
             post("/api/address-book")
         } Then {
             statusCode(204)
         }
+        val now = Instant.now().toEpochMilli()
         When {
             get ("/api/address-book")
         } Then {
+            log().all()
             statusCode(200)
             body("size()",`is`(1))
             body("[0].firstName",`is`("Ronald"))
+            body("[0].creationTimestamp", allOf(greaterThanOrEqualTo(now-1000), lessThan(now+1000)))
         }
     }
 }

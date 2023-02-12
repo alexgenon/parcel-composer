@@ -14,7 +14,7 @@ function SearchResults({candidateAddresses, addressClicked,removeAddress}: Searc
         return (
             <List>
                 {candidateAddresses.map(address =>
-                    <ListItem key={address.id}
+                    <ListItem key={address.businessId}
                               secondaryAction={
                                   <IconButton arial-label="supprimer l'address"
                                               onClick={_ => removeAddress(address)}

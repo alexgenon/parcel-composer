@@ -18,7 +18,7 @@ export const parcelBasketSlice = createSlice({
             state.basket.push(action.payload);
         },
         removeParcel: (state:ParcelBasketState, action: PayloadAction<Address>) => {
-            state.basket = state.basket.filter((it) => {return (it.id !== action.payload.id)});
+            state.basket = state.basket.filter((it) => {return (it.businessId !== action.payload.businessId)});
         },
         resetBasket:(state:ParcelBasketState) => {
             state.basket = [];

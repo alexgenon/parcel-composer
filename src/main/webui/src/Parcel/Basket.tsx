@@ -12,7 +12,7 @@ export interface BasketProps {
 function basketToCards(basket: Address[], removeAction: (address: Address) => void) {
     return basket.map(address => {
         return (
-            <Grid xs={4} md={3} lg={2} key={address.id}>
+            <Grid xs={4} md={3} lg={2} key={address.businessId}>
                 <Card>
                     <CardContent>
                         <Typography component="h3"> {address.firstName} - {address.lastName}</Typography>

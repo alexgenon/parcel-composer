@@ -125,8 +125,8 @@ function ParcelComposer() {
                 processResponse={confirmed => {
                     if (confirmed) {
                         let finalAddress = addressToRemove as Address
-                        deleteAddress(finalAddress.id);
-                        setCandidateAddresses(candidateAddresses.filter(it => it.id !== addressToRemove?.id))
+                        deleteAddress(finalAddress.businessId);
+                        setCandidateAddresses(candidateAddresses.filter(it => it.businessId !== addressToRemove?.businessId))
                     }
                     setAddressToRemove(undefined)
                 }}
