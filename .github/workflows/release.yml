@@ -6,39 +6,29 @@ on:
     
   workflow_dispatch: 
 
-jobs:
-  
-  java-build:
-    name: Build java image
-    runs-on: ubuntu-latest
-    steps:
-        - name: Checkout
-          uses: actions/checkout@v2
-
-        - name: Set up JDK 17
-          uses: actions/setup-java@v1
-          with:
-            java-version: 17
-            
-        - name: Build JVM based
-          run: ./gradlew build
-
-        - name: Build native
-          run: ./gradlew build -Dquarkus.package.type=native
-
-  docker-build-push:
-    runs-on: ubuntu-latest
-    name: Build and push docker image
-    needs: java-build
-    permissions:
+build:
+  name: Build java image
+  permissions:
       packages: write
       contents: read
 
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      GITHUB_ACTOR: "alexgenon"
+  env:
+    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    GITHUB_ACTOR: "alexgenon"
+    
+  runs-on: ubuntu-latest
+  steps:
+      - name: Checkout
+        uses: actions/checkout@v2
 
-    steps:
+      - name: Set up JDK 17
+        uses: actions/setup-java@v1
+        with:
+          java-version: 17
+
+      - name: Build JVM based
+        run: ./gradlew build
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
@@ -59,6 +49,9 @@ jobs:
             ghcr.io/alexgenon/parcel-composer:${{ github.ref_name }}
             ghcr.io/alexgenon/parcel-composer:latest
 
+      - name: Build native
+        run: ./gradlew build -Dquarkus.package.type=native
+      
       - name: Build and push the native docker image
         uses: docker/build-push-action@v3
         with:
