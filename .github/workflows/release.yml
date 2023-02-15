@@ -3,6 +3,8 @@ name: Parcel Composer Release
 on:
   release:
     types: [published]
+    
+  workflow_dispatch: 
 
 jobs:
   
