@@ -4,26 +4,30 @@ on:
   release:
     types: [published]
 
+jobs:
+  
   java-build:
     name: Build java image
     runs-on: ubuntu-latest
-      steps:
-          - name: Checkout
-            uses: actions/checkout@v2
+    steps:
+        - name: Checkout
+          uses: actions/checkout@v2
 
-          - name: Set up JDK 17
-              uses: actions/setup-java@v1
-              with:
-                java-version: 17
-          - name: Build JVM based
-            run: ./gradlew build
+        - name: Set up JDK 17
+          uses: actions/setup-java@v1
+          with:
+            java-version: 17
+            
+        - name: Build JVM based
+          run: ./gradlew build
 
-          - name: Build native
-            run: ./gradlew build -Dquarkus.package.type=native
+        - name: Build native
+          run: ./gradlew build -Dquarkus.package.type=native
 
   docker-build-push:
+    runs-on: ubuntu-latest
     name: Build and push docker image
-    depends-on: java-build
+    needs: java-build
     permissions:
       packages: write
       contents: read
@@ -54,11 +58,11 @@ on:
             ghcr.io/alexgenon/parcel-composer:latest
 
       - name: Build and push the native docker image
-          uses: docker/build-push-action@v3
-          with:
-            push: true
-            context: .
-            file: src/main/docker/Dockerfile.native-micro
-            tags: |
-              ghcr.io/alexgenon/parcel-composer:native-${{ github.ref_name }}
-              ghcr.io/alexgenon/parcel-composer:native-latest
+        uses: docker/build-push-action@v3
+        with:
+          push: true
+          context: .
+          file: src/main/docker/Dockerfile.native-micro
+          tags: |
+            ghcr.io/alexgenon/parcel-composer:native-${{ github.ref_name }}
+            ghcr.io/alexgenon/parcel-composer:native-latest
