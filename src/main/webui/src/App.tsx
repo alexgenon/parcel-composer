@@ -5,7 +5,7 @@ import {store} from "./app/store";
 import ParcelComposer from "./Parcel/Parcel-composer";
 import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
 import MenuBar from "./MenuBar";
-import AddressBook from "./Address/AddressBook";
+import AddressBook from "./AddressBook/AddressBook";
 import CustomerOnMap from "./CustomerOnMap/CustomerOnMap";
 import {AuthContextProps, useAuth} from "react-oidc-context";
 
