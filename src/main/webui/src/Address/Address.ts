@@ -12,16 +12,30 @@ export interface Address {
 }
 
 export class AddressBuilder {
-    originalString: string = '';
+    originalString: string ;
     firstName: string = '';
     lastName: string = '';
     street: string = '';
     streetNb: string='';
     postboxLetter: string = '';
     city: string = '';
-    postcode?: number = undefined;
+    postcode: number=0;
     email: string = '';
     businessId: string = '';
+
+    //constructor();
+    constructor (initData?: Address){
+        this.originalString = initData?.originalString??"";
+        this.firstName= initData?.firstName??'';
+        this.lastName= initData?.lastName??'';
+        this.street= initData?.street??'';
+        this.streetNb = initData?.streetNb??'';
+        this.postboxLetter= initData?.postboxLetter??'';
+        this.city= initData?.city??'';
+        this.postcode = initData?.postcode??0;
+        this.email= initData?.email??'';
+        this.businessId= initData?.businessId??'';
+    }
 
     public build(): Address {
         this.businessId = this.firstName + this.lastName + this.city;
