@@ -88,7 +88,7 @@ function ParcelComposer() {
                     {
                         newAddress ? <AddressEditor address={newAddress}
                                                     buttonText="Sauver et ajouter"
-                                                    buttonAction={a => {
+                                                    buttonAction={(a:AddressBuilder) => {
                                                         setInputStringAddress('');
                                                         let finalAddress = a.build();
                                                         dispatch(addParcel(finalAddress));

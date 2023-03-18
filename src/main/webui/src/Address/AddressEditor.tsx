@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import {Button, Stack, TextField} from "@mui/material";
-import {AddressBuilder} from "./Address";
+import {Address, AddressBuilder} from "./Address";
 import Grid from "@mui/material/Unstable_Grid2";
 
 export interface AddressEditorProps {
@@ -10,11 +10,12 @@ export interface AddressEditorProps {
 }
 
 export function AddressEditor({address, buttonText,buttonAction}: AddressEditorProps) {
-    const [updatedAddress, setUpdatedAddress] = useState(address)
+    const [updatedAddress, setUpdatedAddress] = useState<AddressBuilder>(address)
     const updateAddress = (fieldUpdater: (a:AddressBuilder) => void) => {
-        let newAddress:AddressBuilder= JSON.parse(JSON.stringify(updatedAddress)) as AddressBuilder;
-        fieldUpdater(newAddress);
-        setUpdatedAddress(newAddress);
+        let newAddress:Address= JSON.parse(JSON.stringify(updatedAddress)) ;
+        let newBuilder = new AddressBuilder(newAddress);
+        fieldUpdater(newBuilder);
+        setUpdatedAddress(newBuilder);
     }
 
     return (
@@ -40,7 +41,7 @@ export function AddressEditor({address, buttonText,buttonAction}: AddressEditorP
                 /> </Grid>
             </Grid>
             <Grid container spacing={1}>
-                <Grid xs={10}> <TextField fullWidth={true} id="street"
+                <Grid xs={8}> <TextField fullWidth={true} id="street"
                                           value={updatedAddress.street}
                                           label="Rue"
                                           onChange={ e => {
@@ -55,6 +56,15 @@ export function AddressEditor({address, buttonText,buttonAction}: AddressEditorP
                                          onChange={ e => {
                                              updateAddress(a => {
                                                  a.streetNb = e.target.value;
+                                             })
+                                         }}
+                /> </Grid>
+                <Grid xs={2}> <TextField fullWidth={true} id="postBoxLetter"
+                                         value={updatedAddress.postboxLetter}
+                                         label="Boîte"
+                                         onChange={ e => {
+                                             updateAddress(a => {
+                                                 a.postboxLetter = e.target.value;
                                              })
                                          }}
                 /> </Grid>

@@ -35,6 +35,7 @@ dependencies {
     testImplementation("io.rest-assured:rest-assured")
     testImplementation("io.rest-assured:kotlin-extensions")
     testImplementation("io.quarkus:quarkus-test-security")
+    testImplementation("io.quarkus:quarkus-junit5-mockito")
 }
 
 group = "be.aufildemescoutures"

@@ -24,7 +24,7 @@ class Address(): PanacheEntityBase {
     lateinit var firstName: String
     lateinit var lastName: String
     lateinit var street: String
-    lateinit var streetNb: String // Some street numbers can contain letters and there is no added lateinit varue to have a Int
+    lateinit var streetNb: String // Some street numbers can contain letters and there is no added to have a Int
     lateinit var postboxLetter: String
     lateinit var city: String
     var postcode: Int = -1 // Post code is officially defined as 4 digits so Int is safe here
