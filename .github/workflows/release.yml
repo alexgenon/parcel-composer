@@ -37,6 +37,9 @@ jobs:
             username: ${{ github.repository_owner }}
             password: ${{ secrets.GITHUB_TOKEN }}
 
+        - name: Build JVM based image
+          run: ./gradlew build
+
         - name: Build and push the JVM docker image
           uses: docker/build-push-action@v3
           with:
