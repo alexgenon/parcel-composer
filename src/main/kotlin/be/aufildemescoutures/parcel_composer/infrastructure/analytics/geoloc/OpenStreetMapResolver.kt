@@ -21,9 +21,5 @@ interface OpenStreetMapResolver {
     fun search(@QueryParam("format") format:String,
                @QueryParam("addressdetails") addressDetails: Int,
                @QueryParam("q") address:String): Uni<JsonElement>
-
-    companion object {
-
-    }
 }
 

@@ -2,47 +2,74 @@ package be.aufildemescoutures.parcel_composer.address_book
 
 import be.aufildemescoutures.parcel_composer.user.UserId
 import be.aufildemescoutures.parcel_composer.user.UserService
+import io.smallrye.mutiny.Multi
+import io.smallrye.mutiny.Uni
+import io.vertx.mutiny.core.eventbus.EventBus
 import org.jboss.logging.Logger
 import javax.enterprise.context.ApplicationScoped
 import javax.enterprise.inject.Default
 import javax.inject.Inject
-import javax.transaction.Transactional
 
 @ApplicationScoped
-@Transactional
 class AddressBookService {
 
     @Inject
     @field:Default
     lateinit var userService: UserService
 
+    @Inject
+    lateinit var eventBus: EventBus
+
     private val LOG = Logger.getLogger(javaClass)
 
-    fun resetAddressBook(userId:UserId,newAddresses: Set<Address>) {
-        LOG.info("Resetting $userId address book")
-        val book = AddressBook.findByUser(userId)
-        book.truncateBook()
-        this.addAddresses(book,newAddresses)
+    fun getAllAddresses(userId: UserId): Uni<List<Address>> = AddressBook
+        .findOrCreateForUser(userId)
+        .flatMap { it.allAddresses() }
+
+    fun newAddress(userId: UserId, address: Address): Uni<Address> {
+        LOG.info("Adding address ${address.businessId} to $userId address book")
+        return AddressBook.findOrCreateForUser(userId)
+            .flatMap { newAddress(it,address)}
     }
 
-    fun getAllAddresses(userId:UserId) = AddressBook.findByUser(userId).allAddresses()
+    fun newAddress(book: AddressBook, address: Address):Uni<Address> =
+        book.newAddress(address)
+            .call { updatedAddress-> newAddressEvent(updatedAddress) }
 
-    private fun addAddresses(addressBook: AddressBook, addresses: Set<Address>) =
-        addresses.forEach { addressBook.newAddress(it) }
-
-    fun addAddresses(userId:UserId, addresses: Set<Address>) {
-        LOG.info("Adding addresses $addresses to $userId address book")
-        val addressBook = AddressBook.findByUser(userId)
-        this.addAddresses(addressBook,addresses)
+    fun removeAddress(userId: UserId, businessId: String): Uni<Long> {
+        LOG.info("Removing address $businessId from $userId address book")
+        return AddressBook.findOrCreateForUser(userId)
+            .flatMap { it.removeAddress(businessId) }
+            .call{ deleteCount -> Uni.createFrom().item {  LOG.info("$deleteCount element removed")} }
     }
 
-    fun newAddress(userId:UserId, address: Address) {
-        LOG.info("Adding address $address to $userId address book")
-        AddressBook.findByUser(userId).newAddress(address)
+    fun addAddresses(userId: UserId, addresses: Set<Address>, resetBook: Boolean): Uni<AddressBook> {
+        LOG.info("Adding addresses to $userId address book, reset book $resetBook")
+
+        val bookUni = AddressBook.findOrCreateForUser(userId)
+        return bookUni.onItem()
+            .call { book ->
+                val preProcessedBook = if (resetBook) {
+                    book.truncateBook()
+                } else {
+                    Uni.createFrom().item(0)
+                }
+                preProcessedBook.map { addAddressesInBook(book, addresses) }
+            }
     }
 
-    fun removeAddress(userId:UserId, businessId:String){
-        val deleteCount = AddressBook.findByUser(userId).removeAddress(businessId)
-        LOG.info("Removing address $businessId from $userId address book: $deleteCount entries removed")
+    private fun addAddressesInBook(book: AddressBook, addresses: Set<Address>): Multi<Address> {
+        return Multi
+            .createFrom()
+            .iterable(addresses)
+            .flatMap { address -> newAddress(book,address).toMulti() }
     }
+
+    private fun newAddressEvent(address: Address) =
+        Uni.createFrom().item { eventBus.publish(Address.NEW_ADDRESS_EVENT, address) }
+
+    fun getAddress(userId: UserId, businessId: String) =
+        AddressBook
+            .findOrCreateForUser(userId)
+            .flatMap { it.findAddress(businessId) }
 }

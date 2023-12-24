@@ -9,8 +9,9 @@ import kotlinx.serialization.json.jsonObject
 import org.eclipse.microprofile.rest.client.inject.RestClient
 import org.jboss.logging.Logger
 import javax.enterprise.context.ApplicationScoped
-
-data class AddressOnMap(val address: Address, val lat: Double, val lon: Double)
+import be.aufildemescoutures.parcel_composer.analytics.geoloc.AddressOnMap
+import io.smallrye.mutiny.unchecked.Unchecked
+import javax.ws.rs.NotFoundException
 
 @ApplicationScoped
 class AddressResolutionService {
@@ -18,8 +19,8 @@ class AddressResolutionService {
     @RestClient
     private lateinit var openStreetMapResolver: OpenStreetMapResolver
 
-    fun getAddress(address: Address): Uni<AddressOnMap?> {
-        val queryResult = openStreetMapResolver.search("jsonv2",1,formatAddress(address))
+    fun getAddress(address: Address): Uni<AddressOnMap> {
+        val queryResult = openStreetMapResolver.search("jsonv2",1,address.toMapQuery())
         return convertQueryResult(queryResult,address)
     }
 
@@ -27,16 +28,18 @@ class AddressResolutionService {
         private fun convertQueryResult(queryResult: Uni<JsonElement>, address: Address) =
             queryResult
                 .map(JsonElement::jsonArray)
-                .map { json ->
+                .map (Unchecked.function { json ->
                     if (json.size == 0) {
-                        null
+                        throw NotFoundException("No match in OpenStreetMap")
                     } else {
                         val firstResult = json.jsonArray[0].jsonObject
-                        AddressOnMap(address, toDouble(firstResult, "lat"), toDouble(firstResult, "lon"))
+                        AddressOnMap(address.businessId,
+                            toDouble(firstResult, "lat"),
+                            toDouble(firstResult, "lon"))
                     }
-                }
+                })
 
-        private fun formatAddress(ad: Address) = "${ad.street} - ${ad.postcode} ${ad.city}"
+        private fun Address.toMapQuery() = "${street} - ${postcode} ${city}"
         private fun toDouble(firstResult: JsonObject, key: String) =
             firstResult[key].toString().replace("\"", "").toDouble()
     }

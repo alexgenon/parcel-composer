@@ -1,22 +1,23 @@
 package be.aufildemescoutures.parcel_composer.address_book
 
 import be.aufildemescoutures.parcel_composer.user.UserId
-import io.quarkus.hibernate.orm.panache.kotlin.PanacheCompanion
-import io.quarkus.hibernate.orm.panache.kotlin.PanacheEntity
+import io.quarkus.hibernate.reactive.panache.kotlin.PanacheCompanion
+import io.quarkus.hibernate.reactive.panache.kotlin.PanacheEntity
+import io.smallrye.mutiny.Multi
+import io.smallrye.mutiny.Uni
 import org.jboss.logging.Logger
 import javax.persistence.Entity
-import javax.persistence.OneToOne
 
 @Entity
 @kotlinx.serialization.Serializable
 class AddressBook : PanacheEntity() {
     lateinit var userId: String
 
-    fun allAddresses(): Set<Address> = Address.findAllForAddressBook(this)
-    fun newAddress(address: Address): Address {
+    fun allAddresses(): Uni<List<Address>> = Address.findAllForAddressBook(this)
+    fun findAddress(businessId: String) = Address.findForAddressBook(this,businessId)
+    fun newAddress(address: Address): Uni<Address> {
         address.addressBook = this
-        address.persist()
-        return address
+        return address.persist()
     }
 
     fun removeAddress(businessId: String) = Address.delete("businessId=?1 and addressBook=?2", businessId,this)
@@ -26,15 +27,19 @@ class AddressBook : PanacheEntity() {
     companion object : PanacheCompanion<AddressBook> {
         private val LOG = Logger.getLogger(javaClass)
 
-        fun findByUser(userId: UserId): AddressBook =
-            find("userId", userId.toString()).firstResult() ?: newAddressBook(userId)
+        fun findOrCreateForUser(userId: UserId): Uni<AddressBook> =
+            find("userId", userId.toString())
+                .firstResult()
+                .onItem()
+                .ifNull()
+                .switchTo { newAddressBook(userId) }
+                .map { it!! }
 
-        private fun newAddressBook(userId: UserId): AddressBook {
+        private fun newAddressBook(userId: UserId): Uni<AddressBook> {
             LOG.info("Creating new Address book for $userId")
             val newBook = AddressBook()
             newBook.userId = userId.toString()
-            newBook.persist()
-            return newBook
+            return newBook.persist<AddressBook>()
         }
     }
 }

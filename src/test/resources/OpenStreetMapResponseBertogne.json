@@ -1,0 +1,34 @@
+[
+  {
+    "place_id": 181551702,
+    "licence": "Data © OpenStreetMap contributors, ODbL 1.0. https://osm.org/copyright",
+    "osm_type": "way",
+    "osm_id": 302861531,
+    "boundingbox": [
+      "50.0808024",
+      "50.0826143",
+      "5.6648867",
+      "5.666549"
+    ],
+    "lat": "50.0818725",
+    "lon": "5.6657855",
+    "display_name": "Rue Grande, Bertogne, Bastogne, Luxembourg, Wallonia, 6687, Belgium",
+    "place_rank": 26,
+    "category": "highway",
+    "type": "secondary",
+    "importance": 0.5200099999999999,
+    "address": {
+      "road": "Rue Grande",
+      "city_district": "Bertogne",
+      "village": "Bertogne",
+      "county": "Bastogne",
+      "state": "Luxembourg",
+      "ISO3166-2-lvl6": "BE-WLX",
+      "region": "Wallonia",
+      "ISO3166-2-lvl4": "BE-WAL",
+      "postcode": "6687",
+      "country": "Belgium",
+      "country_code": "be"
+    }
+  }
+]
